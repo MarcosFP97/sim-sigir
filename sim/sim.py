@@ -42,21 +42,23 @@ def first_step_gen(
 def second_step_gen(
     headline:str,
     text:str, # either first paragrph or full text
-    old_query:str,
+    old_queries:list,
     snippets_concated:str,
     full_text_snippets:str
   ):
   if second_step_mode=="snippet":
     if first_step_mode=="title":
-      prompt= f'Given the headline of a webpage, a user has typed a web query to verify the correctness of the information provided in the webpage.\
-        We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
-        Taking into account the headline of the webpage, the user query and the search results, your task is to generate a new user query \
+      prompt= f'Given the headline of a webpage, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
+        We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.\
+        Taking into account the headline of the webpage, the user session queries and the search results, your task is to generate a new user query \
         to further verify the correctness of the information provided in the webpage. \
+        Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift. \
         Avoid using stopwords. Queries should have between 3-5 words length. \
         Headline of the Webpage: {headline}\n \
-        User Query: \"{old_query}\"\n \
+        User Queries: \"{old_queries}\"\n \
         Search results: {snippets_concated}\nNew User Query:' #### I added stopwords and correct information
       print(prompt)
+    ########## MODIFY PROMPTS!!!!
     elif first_step_mode=="paragraph":
       prompt= f'Given the headline of a webpage and its first paragraph, a user has typed a web query to verify the correctness of the information provided in the webpage.\
         We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
@@ -65,7 +67,7 @@ def second_step_gen(
         Avoid using stopwords. Queries should have between 3-5 words length. \
         Headline of the Webpage: {headline}\n \
         First Paragraph of the Webpage: {text}\n \
-        User Query: \"{old_query}\" \n \
+        User Query: \"{old_queries}\" \n \
         Search results: {snippets_concated}\nNew User Query:' #### I added stopwords and correct information
     elif first_step_mode=="full_text":
       prompt= f'Given the headline of a webpage and its body, a user has typed a web query to verify the correctness of the information provided in the webpage.\
@@ -75,7 +77,7 @@ def second_step_gen(
         Avoid using stopwords. Queries should have between 3-5 words length. \
         Headline of the Webpage: {headline}\n \
         Body of the Webpage: {text}\n \
-        User Query: \"{old_query}\" \n \
+        User Query: \"{old_queries}\" \n \
         Search results: {snippets_concated}\nNew User Query:' #### I added stopwords and correct information
     #print(prompt)
   elif second_step_mode=="full_text":
@@ -87,7 +89,7 @@ def second_step_gen(
           to further verify the correctness of the information provided in the webpage. \
           Avoid using stopwords. Queries should have between 3-5 words length. \
           Headline of the Webpage: {headline}\n \
-          User Query: \"{old_query}\" \n \
+          User Query: \"{old_queries}\" \n \
           Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
     elif first_step_mode=="paragraph":
       prompt= f'Given the headline of a webpage and its first paragraph, a user has typed a web query to verify the correctness of the information provided in the webpage.\
@@ -98,7 +100,7 @@ def second_step_gen(
           Avoid using stopwords. Queries should have between 3-5 words length. \
           Headline of the Webpage: {headline}\n \
           First Paragraph of the Webpage: {text}\n \
-          User Query: \"{old_query}\" \n \
+          User Query: \"{old_queries}\" \n \
           Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
     elif first_step_mode=="full_text":
       prompt= f'Given the headline of a webpage and its body, a user has typed a web query to verify the correctness of the information provided in the webpage.\
@@ -109,7 +111,7 @@ def second_step_gen(
           Avoid using stopwords. Queries should have between 3-5 words length. \
           Headline of the Webpage: {headline}\n \
           Body of the Webpage: {text}\n \
-          User Query: \"{old_query}\" \n \
+          User Query: \"{old_queries}\" \n \
           Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
 
   completion = client.chat.completions.create(
@@ -175,14 +177,15 @@ def eval_serp(serp):
 
 def simulate(corpus):
     ll = list({1,2,3,4,5,6,8})*5
-    count=34 ######### THIS!!!
-    for sample in ll[33:]: # samples: ##### THIS!!!
+    count=1 ######### THIS!!!
+    for sample in ll: # samples: ##### THIS!!!
         print("=======SESSION STARTED=========")
         print(f"Session length: {sample}")
         cols = ["URL", "query", "SERP", "AVG_SCORE", "STEP"]
         session = pd.DataFrame(columns=cols)
 
         last_serps = {} ### variable para ir almacenando el último serp de cada artículo original
+        session_queries = {}
         for i in range(sample):
             if i==0: ### the first step is always different
                 print(f"STEP {i+1}")
@@ -191,9 +194,12 @@ def simulate(corpus):
                     #### CALL TO GEN
                         query_gen = first_step_gen(headline, "")
                         query_gen = query_gen.replace('"', '')
-                        print(query_gen)
+                        if orig_url not in session_queries:
+                           session_queries[orig_url] = []
+                        session_queries[orig_url].append(query_gen)
+                        print(session_queries[orig_url])
                         serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
-                        last_serps[orig_url] = [query_gen, headline, "", serp] ### KEEPING TRACK OF THE LAST SERPS
+                        last_serps[orig_url] = [session_queries[orig_url], headline, "", serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
                         print(avg_score)
@@ -225,6 +231,7 @@ def simulate(corpus):
                         last_serps[orig_url] = [query_gen, headline, text, serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
+                        print(avg_score)
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
             else:
@@ -236,13 +243,14 @@ def simulate(corpus):
                         # print("SERP", serp)
                         for entry in serp[3].values():
                             snippets_concat += "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\"\n' # "\" Snippet: \"" + entry["Snippet"] +'\"\n' #
-                        query_gen = second_step_gen(serp[1], serp[2], serp[0],snippets_concat, None)
+                        query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, None)
                         query_gen = query_gen.replace('"', '')
-                        print(query_gen)
+                        session_queries[orig_url].append(query_gen)
+                        print(session_queries[orig_url])
                         serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
                         headline = last_serps[orig_url][1] #### WE NEED TO PROPAGATE THE HEADLINE AND THE ORIGINAL TEXT (NONE, PARAGRAPH OR FULL TEXT) TO AVOID ERRORS
                         text = last_serps[orig_url][2]
-                        last_serps[orig_url] = [query_gen, headline, text, serp] #### UPDATE LAST SERP
+                        last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] #### UPDATE LAST SERP
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
                         print(avg_score)

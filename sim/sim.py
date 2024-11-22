@@ -176,9 +176,9 @@ def eval_serp(serp):
   return np.mean(newsguard)
 
 def simulate(corpus):
-    ll = list({1,2,3,4,5,6,8})*5
-    count=1 ######### THIS!!!
-    for sample in ll: # samples: ##### THIS!!!
+    ll = list({1,2,3,4,5,6})*5
+    count=7 ######### THIS!!!
+    for sample in ll[6:]: # samples: ##### THIS!!!
         print("=======SESSION STARTED=========")
         print(f"Session length: {sample}")
         cols = ["URL", "query", "SERP", "AVG_SCORE", "STEP"]

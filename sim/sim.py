@@ -14,30 +14,43 @@ import time
 import numpy as np
 import pandas as pd
 from config import OPENAI_API_KEY, MODEL, BING_API_KEYS
+from ollama import chat
+from ollama import ChatResponse
 
-def first_step_gen(
+def first_step_gen( #### OLLAMA SERVER TIENE QUE ESTAR LEVANTADO
     headline:str,
     text:str
   ):
   if first_step_mode=="title":
     prompt= f'Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage. \
-        Avoid using stopwords. Queries should have between 3-5 words length.  Headline of the Webpage: {headline}\n Query:"' #### I added stopwords and correct information
+        Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: {headline}\n Query:"' #### I added stopwords and correct information
   elif first_step_mode=="paragraph":
     prompt= f'Given the headline of a webpage and its first paragraph, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage. \
-        Avoid using stopwords. Queries should have between 3-5 words length.  Headline of the Webpage: {headline}\n First Paragraph of the Webpage:{text}\n Query:"' #### I added stopwords and correct information
+        Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: {headline}\n First Paragraph of the Webpage:{text}\n Query:"' #### I added stopwords and correct information
   elif first_step_mode=="full_text":
     prompt= f'Given the headline of a webpage and its body, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage. \
-        Avoid using stopwords. Queries should have between 3-5 words length.  Headline of the Webpage: {headline}\n Body of the Webpage:{text}\n Query:"' #### I added stopwords and correct information
-  completion = client.chat.completions.create(
-    model=MODEL,
-    messages=[
-      {"role": "system", "content": "You are a search query writer"},
-      {"role": "user", "content": prompt}
-    ],
-    temperature=0.7
-  )
+        Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: {headline}\n Body of the Webpage:{text}\n Query:"' #### I added stopwords and correct information
+  
+  response: ChatResponse = chat(model='llama3:8b-instruct-q4_0', messages=[
+    {
+      'role': 'user',
+      'content': prompt,
+    },
+  ], options={'num_predict':10})
+  
+  query = response['message']['content']
+  query = query.replace('\'','').replace('\"','')
+  print(query)
+  # completion = client.chat.completions.create(
+  #   model=MODEL,
+  #   messages=[
+  #     {"role": "system", "content": "You are a search query writer"},
+  #     {"role": "user", "content": prompt}
+  #   ],
+  #   temperature=0.7
+  # )
 
-  return completion.choices[0].message.content
+  return query
 
 def second_step_gen(
     headline:str,
@@ -58,28 +71,33 @@ def second_step_gen(
         User Queries: \"{old_queries}\"\n \
         Search results: {snippets_concated}\nNew User Query:' #### I added stopwords and correct information
       print(prompt)
-    ########## MODIFY PROMPTS!!!!
+    
     elif first_step_mode=="paragraph":
-      prompt= f'Given the headline of a webpage and its first paragraph, a user has typed a web query to verify the correctness of the information provided in the webpage.\
-        We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
-        Taking into account the headline of the webpage, its first paragraph, the user query and the search results, your task is to generate a new user query \
+      prompt= f'Given the headline of a webpage and its first paragraph, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
+        We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.\
+        Taking into account the headline of the webpage, its first paragraph, the user session queries and the search results, your task is to generate a new user query \
         to further verify the correctness of the information provided in the webpage. \
+        Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift. \
         Avoid using stopwords. Queries should have between 3-5 words length. \
         Headline of the Webpage: {headline}\n \
         First Paragraph of the Webpage: {text}\n \
-        User Query: \"{old_queries}\" \n \
-        Search results: {snippets_concated}\nNew User Query:' #### I added stopwords and correct information
+        User Queries: \"{old_queries}\"\n \
+        Search results: {snippets_concated}\nNew User Query:'
+    
     elif first_step_mode=="full_text":
-      prompt= f'Given the headline of a webpage and its body, a user has typed a web query to verify the correctness of the information provided in the webpage.\
-        We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
-        Taking into account the headline of the webpage, its body, the user query and the search results, your task is to generate a new user query \
+      prompt= f'Given the headline of a webpage and its body, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
+        We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.\
+        Taking into account the headline of the webpage, its body, the user session queries and the search results, your task is to generate a new user query \
         to further verify the correctness of the information provided in the webpage. \
+        Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift. \
         Avoid using stopwords. Queries should have between 3-5 words length. \
         Headline of the Webpage: {headline}\n \
         Body of the Webpage: {text}\n \
-        User Query: \"{old_queries}\" \n \
-        Search results: {snippets_concated}\nNew User Query:' #### I added stopwords and correct information
+        User Queries: \"{old_queries}\"\n \
+        Search results: {snippets_concated}\nNew User Query:'
     #print(prompt)
+
+  ########## MODIFY PROMPTS!!!!
   elif second_step_mode=="full_text":
     if first_step_mode=="title":
       prompt= f'Given the headline of a webpage, a user has typed a web query to verify the correctness of the information provided in the webpage.\
@@ -87,7 +105,7 @@ def second_step_gen(
           For the first two search results, we also provide you the entire document when available. \
           Taking into account the headline of the webpage, the user query and the search results, your task is to generate a new user query \
           to further verify the correctness of the information provided in the webpage. \
-          Avoid using stopwords. Queries should have between 3-5 words length. \
+          Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. \
           Headline of the Webpage: {headline}\n \
           User Query: \"{old_queries}\" \n \
           Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
@@ -97,7 +115,7 @@ def second_step_gen(
           For the first two search results, we also provide you the entire document when available. \
           Taking into account the headline of the webpage, its first paragraph, the user query and the search results, your task is to generate a new user query \
           to further verify the correctness of the information provided in the webpage. \
-          Avoid using stopwords. Queries should have between 3-5 words length. \
+          Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. \
           Headline of the Webpage: {headline}\n \
           First Paragraph of the Webpage: {text}\n \
           User Query: \"{old_queries}\" \n \
@@ -108,22 +126,32 @@ def second_step_gen(
           For the first two search results, we also provide you the entire document when available. \
           Taking into account the headline of the webpage, its body, the user query and the search results, your task is to generate a new user query \
           to further verify the correctness of the information provided in the webpage. \
-          Avoid using stopwords. Queries should have between 3-5 words length. \
+          Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. \
           Headline of the Webpage: {headline}\n \
           Body of the Webpage: {text}\n \
           User Query: \"{old_queries}\" \n \
           Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
 
-  completion = client.chat.completions.create(
-    model=MODEL,
-    messages=[
-      {"role": "system", "content": "You are a search query writer"},
-      {"role": "user", "content": prompt}
-    ],
-    temperature=0.7
-  )
+    response: ChatResponse = chat(model='llama3:8b-instruct-q4_0', messages=[
+      {
+        'role': 'user',
+        'content': prompt,
+      },
+    ], options={'num_predict':10})
+    
+    query = response['message']['content']
+    query = query.replace('\'','').replace('\"','')
+    print(query)
+    # completion = client.chat.completions.create(
+    #   model=MODEL,
+    #   messages=[
+    #     {"role": "system", "content": "You are a search query writer"},
+    #     {"role": "user", "content": prompt}
+    #   ],
+    #   temperature=0.7
+    # )
 
-  return completion.choices[0].message.content
+    return query
 
 '''
 This sample makes a call to the Bing Web Search API with a query and returns relevant web search.
@@ -213,11 +241,15 @@ def simulate(corpus):
                         first_paragraph = text.split('\n')[0]
                         query_gen = first_step_gen(headline, first_paragraph)
                         query_gen = query_gen.replace('"', '')
-                        print(query_gen)
+                        if orig_url not in session_queries:
+                           session_queries[orig_url] = []
+                        session_queries[orig_url].append(query_gen)
+                        print(session_queries[orig_url])
                         serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
-                        last_serps[orig_url] = [query_gen, headline, text, serp] ### KEEPING TRACK OF THE LAST SERPS
+                        last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
+                        print(avg_score)
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
                 elif first_step_mode=="full_text":
@@ -226,9 +258,12 @@ def simulate(corpus):
                         #### CALL TO GEN
                         query_gen = first_step_gen(headline, text)
                         query_gen = query_gen.replace('"', '')
-                        print(query_gen)
+                        if orig_url not in session_queries:
+                           session_queries[orig_url] = []
+                        session_queries[orig_url].append(query_gen)
+                        print(session_queries[orig_url])
                         serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
-                        last_serps[orig_url] = [query_gen, headline, text, serp] ### KEEPING TRACK OF THE LAST SERPS
+                        last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
                         print(avg_score)

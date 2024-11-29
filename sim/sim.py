@@ -19,7 +19,7 @@ from ollama import chat
 from ollama import ChatResponse
 from duckduckgo_search import DDGS
 
-logging.basicConfig(filename="full_snippet.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logging.basicConfig(filename="title_full_text.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 
 def first_step_gen( #### OLLAMA SERVER TIENE QUE ESTAR LEVANTADO
     headline:str,
@@ -62,7 +62,8 @@ def second_step_gen(
     text:str, # either first paragrph or full text
     old_queries:list,
     snippets_concated:str,
-    full_text_snippets:str
+    first_full_text:str,
+    second_full_text:str
   ):
   if second_step_mode=="snippet":
     if first_step_mode=="title":
@@ -109,16 +110,22 @@ def second_step_gen(
   ########## MODIFY PROMPTS!!!!!!!
   elif second_step_mode=="full_text":
     if first_step_mode=="title":
-      prompt= f'Given the headline of a webpage, a user has typed a web query to verify the correctness of the information provided in the webpage.\
-          We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
-          For the first two search results, we also provide you the entire document when available. \
-          Taking into account the headline of the webpage, the user query and the search results, your task is to generate a new user query \
-          to further verify the correctness of the information provided in the webpage. \
-          Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. \
-          Headline of the Webpage: {headline}\n \
-          User Query: \"{old_queries}\" \n \
-          Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
-    elif first_step_mode=="paragraph":
+      prompt= f'Given the headline of a webpage, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
+        We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.\
+        We also provide you with the full text of the first two results. \
+        Taking into account the headline of the webpage, the user session queries and the search results, your task is to generate a new user query \
+        to further verify the correctness of the information provided in the webpage. \
+        Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift. \
+        Avoid using stopwords. Queries should have between 3-5 words length. \
+        Answer ONLY with the query.\
+        Headline of the Webpage: \"{headline}\"\n \
+        User Queries: \"{old_queries}\"\n \
+        Search results: \"{snippets_concated}\"\n \
+        Full text of the first search result: \"{first_full_text}\"\n \
+        Full text of the second search result:\"{second_full_text}\"\n\
+        New User Query:(just answer with the query)'
+      logging.info(prompt)
+    elif first_step_mode=="paragraph":f
       prompt= f'Given the headline of a webpage and its first paragraph, a user has typed a web query to verify the correctness of the information provided in the webpage.\
           We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
           For the first two search results, we also provide you the entire document when available. \
@@ -301,7 +308,7 @@ def simulate(corpus):
                         # logging.info("SERP", serp)
                         for entry in serp[3].values():
                             snippets_concat += "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\"\n' # "\" Snippet: \"" + entry["Snippet"] +'\"\n' #
-                        query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, None)
+                        query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, None, None)
                         query_gen = query_gen.replace('"', '')
                         session_queries[orig_url].append(query_gen)
                         logging.info(session_queries[orig_url])
@@ -317,13 +324,19 @@ def simulate(corpus):
 
                 elif second_step_mode=='full_text': #### !!!!! A VECES NO APARECE EL PRIMER-SEGUNDO TEXTO
                     for orig_url, serp in last_serps.items(): # WE USE THE LAST SERP AS ENTRANCE FOR THE NEXT SIMULATION STEP
-                        full_text_snippets_concat = "" ### IN THE FIRST VARIANT WE CONCAT ALL THE SNIPPETS
-                        for i, entry in enumerate(serp[3].values()):
-                            if i==0 or i==1:
-                                full_text_snippets_concat +=  "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\" Full Text: \"'+entry["Full_text"]+'\"\n'
-                            else:
-                                full_text_snippets_concat += "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\"\n'
-                        query_gen = second_step_gen(serp[1], serp[2], serp[0], None, full_text_snippets_concat)
+                        snippets_concat, first_full_text, second_full_text = "", "", "" ### IN THE FIRST VARIANT WE CONCAT ALL THE SNIPPETS
+                        i=0
+                        for entry in serp[3].values():
+                            snippets_concat += "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\"\n' 
+                            if entry["Full_text"]:
+                              if i==0:
+                                first_full_text = entry["Full_text"]
+                                i+=1
+                              elif i==1:
+                                second_full_text = entry["Full_text"]
+                                i+=1
+
+                        query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, first_full_text, second_full_text)
                         query_gen = query_gen.replace('"', '')
                         logging.info(query_gen)
                         serp = bing_search(query_gen, True) ##### !!!!! I NEED TO MODIFY THE FRESHNESS

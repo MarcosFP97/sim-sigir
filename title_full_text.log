@@ -1,0 +1,248 @@
+nohup: ignoring input
+/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+/home/marcos.fernandez.pichel/PhD/sim-sigir/sim/sim.py:265: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
+/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+Traceback (most recent call last):
+  File "/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/marcos.fernandez.pichel/anaconda3/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/marcos.fernandez.pichel/PhD/sim-sigir/sim/sim.py", line 365, in <module>
+    simulate(corpus)
+  File "/home/marcos.fernandez.pichel/PhD/sim-sigir/sim/sim.py", line 342, in simulate
+    serp = bing_search(query_gen, True) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+TypeError: bing_search() takes 1 positional argument but 2 were given
+les/hillary-clinton-did-it-robby-mook-michael-sussmann-donald-trump-russia-collusion-alfa-bank-11653084709, html: <!DOCTYPE html><html lang="en-US"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><meta name="next-head-count" content="2"/><link rel="preload" href="https://www.wsj.c
+2024-11-29 11:10:50,443 - get_html_status(): bad status code 401 on URL: https://www.reuters.com/world/us/donald-trump-sues-hillary-clinton-others-over-russian-collusion-allegations-2022-03-24/, html: <html><head><title>reuters.com</title><style>#cmsg{animation: A 1.5s;}@keyframes A{0%{opacity:0;}99%{opacity:0;}100%{opacity:1;}}</style></head><body style="margin:0"><p id="cmsg">Please enable JS and
+2024-11-29 11:11:03,731 - 92.14285714285714
+2024-11-29 11:11:03,733 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Looks like New York prosecutors have a witness directly incriminating Donald Trump
+ Query:"
+2024-11-29 11:11:03,981 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:11:03,981 - New York witness incriminates Trump
+2024-11-29 11:11:03,981 - ['New York witness incriminates Trump']
+2024-11-29 11:11:03,981 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:11:28,918 - 95.41666666666667
+2024-11-29 11:11:28,919 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Enthusiasm for Trump's rally in Arizona dwarfs President Biden's town hall just days earlier
+ Query:"
+2024-11-29 11:11:29,064 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:11:29,065 - Trumps rally attendance comparison
+2024-11-29 11:11:29,065 - ['Trumps rally attendance comparison']
+2024-11-29 11:11:29,065 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:11:30,803 - get_html_status(): bad status code 403 on URL: https://www.newsweek.com/video-comparing-trumps-bidens-wilkes-barre-crowds-viewed-over-11m-times-1739712, html: Forbidden
+2024-11-29 11:11:45,119 - 92.375
+2024-11-29 11:11:45,121 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Trump Rejects 'Fake' Jan. 6 Panel: 'Will Nancy Investigate Herself?'
+ Query:"
+2024-11-29 11:11:45,246 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:11:45,247 - Trump January 6 investigation
+2024-11-29 11:11:45,247 - ['Trump January 6 investigation']
+2024-11-29 11:11:45,247 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:12:03,608 - 98.33333333333333
+2024-11-29 11:12:03,609 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Matt Gaetz and Marjorie Taylor Greene get run out of their own protest rally
+ Query:"
+2024-11-29 11:12:03,712 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:12:03,712 - Gaetz Protest Incident
+2024-11-29 11:12:03,712 - ['Gaetz Protest Incident']
+2024-11-29 11:12:03,712 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:12:05,881 - get_html_status(): bad status code 403 on URL: https://www.newsweek.com/gaetz-defiant-after-saying-ugly-women-protest-abortion-offended-1727805, html: Forbidden
+2024-11-29 11:12:20,190 - 96.11111111111111
+2024-11-29 11:12:20,191 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Banks: Pelosi Doesn't Want 'Tough Questions' Because She's Responsible for Breakdown of Security on Jan. 6'
+ Query:"
+2024-11-29 11:12:20,355 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:12:20,355 - Pelosis January 6th responsibility
+2024-11-29 11:12:20,355 - ['Pelosis January 6th responsibility']
+2024-11-29 11:12:20,355 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:12:41,503 - 98.21428571428571
+2024-11-29 11:12:41,504 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Biden Gang Reportedly Running Two Secret Lists Used to Prevent Outspoken Conservatives from Owning Guns – Laura Loomer Speaks Out on This Injustice
+ Query:"
+2024-11-29 11:12:41,647 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:12:41,648 - Biden secret gun lists
+2024-11-29 11:12:41,648 - ['Biden secret gun lists']
+2024-11-29 11:12:41,648 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:12:59,287 - 95.0
+2024-11-29 11:12:59,288 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Foreign News Media Laughs at Joe Biden: He 'Needs a Retirement Home and a Warm Bowl of Soup'
+ Query:"
+2024-11-29 11:12:59,432 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:12:59,433 - Biden retirement home
+2024-11-29 11:12:59,433 - ['Biden retirement home']
+2024-11-29 11:12:59,433 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:13:13,265 - nan
+2024-11-29 11:13:13,266 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: 'Falsified Data': Pfizer Vaccine Trial Had Major Flaws, Whistleblower Tells Peer-Reviewed Journal
+ Query:"
+2024-11-29 11:13:13,401 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:13:13,401 - Pfizer vaccine trial flaws
+2024-11-29 11:13:13,401 - ['Pfizer vaccine trial flaws']
+2024-11-29 11:13:13,401 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:13:36,876 - 100.0
+2024-11-29 11:13:36,877 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: “Zero COVID” Catastrophe: Participating Nations See New Records Across the Board
+ Query:"
+2024-11-29 11:13:37,023 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:13:37,023 - COVID records new highs
+2024-11-29 11:13:37,023 - ['COVID records new highs']
+2024-11-29 11:13:37,023 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:13:46,222 - get_html_status(): bad status code 401 on URL: https://www.reuters.com/world/us/us-coronavirus-cases-hit-record-high-2021-12-29/, html: <html><head><title>reuters.com</title><style>#cmsg{animation: A 1.5s;}@keyframes A{0%{opacity:0;}99%{opacity:0;}100%{opacity:1;}}</style></head><body style="margin:0"><p id="cmsg">Please enable JS and
+2024-11-29 11:14:01,007 - 95.0
+2024-11-29 11:14:01,007 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Chicago Chamber Of Commerce Rages As Average Unemployed Illinoisan Parent Earns $35/Hour Sitting On The Couch
+ Query:"
+2024-11-29 11:14:01,171 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:14:01,172 - Illinois parental hourly wages couch sitting
+2024-11-29 11:14:01,172 - ['Illinois parental hourly wages couch sitting']
+2024-11-29 11:14:01,172 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:14:02,242 - get_html_status(): bad status code 429 on URL: https://www.mystateline.com/news/local-news/how-much-should-i-get-paid-for-babysitting-in-illinois/, html: too many requests
+2024-11-29 11:14:32,132 - nan
+2024-11-29 11:14:32,133 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Ashli Babbitt's Mom: Nancy Pelosi Orchestrated the Killing of My Daughter
+ Query:"
+2024-11-29 11:14:32,322 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:14:32,322 - Ashli Babbitt murder investigation
+2024-11-29 11:14:32,322 - ['Ashli Babbitt murder investigation']
+2024-11-29 11:14:32,322 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:14:39,163 - get_html_status(): bad status code 429 on URL: https://www.wboy.com/news/politics/ashli-babbitt-a-martyr-her-past-tells-a-more-complex-story/, html: too many requests
+2024-11-29 11:14:42,148 - get_html_status(): bad status code 429 on URL: https://www.wavy.com/news/national/mother-of-capitol-rioter-shot-killed-on-jan-6-arrested-at-demonstration-in-dc-two-years-later/, html: too many requests
+2024-11-29 11:14:52,737 - 97.5
+2024-11-29 11:14:52,738 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: AZ State Senator Demands Biden Electors Be Recalled, New Election Be Held After Shocking Audit Revelations
+ Query:"
+2024-11-29 11:14:52,881 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:14:52,881 - Biden elector recall
+2024-11-29 11:14:52,881 - ['Biden elector recall']
+2024-11-29 11:14:52,881 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:15:06,513 - 95.0
+2024-11-29 11:15:06,513 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: Rand Paul is left speechless after Dr. Fauci tears into him for lying in Senate hearing
+ Query:"
+2024-11-29 11:15:06,661 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:15:06,661 - Paul Fauci Senate Hearing
+2024-11-29 11:15:06,661 - ['Paul Fauci Senate Hearing']
+2024-11-29 11:15:06,661 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:15:08,333 - get_html_status(): bad status code 403 on URL: https://www.c-span.org/video/?517046-1/senate-hearing-federal-response-covid-19-variants, html: <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML><HEAD><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<TITLE>ERROR
+2024-11-29 11:15:08,836 - get_html_status(): bad status code 403 on URL: https://www.c-span.org/video/?520938-1/senate-committee-hearing-federal-response-covid-19, html: <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML><HEAD><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<TITLE>ERROR
+2024-11-29 11:15:16,313 - get_html_status(): bad status code 403 on URL: https://www.newsnationnow.com/politics/anthony-fauci-rand-paul-senate-covid-hearing/, html:  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="px-captcha" />
+
+2024-11-29 11:15:26,253 - 89.64285714285714
+2024-11-29 11:15:26,254 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: NIH Director Shredded Over Risky Research In Wuhan After CNN Interview Goes Sideways
+ Query:"
+2024-11-29 11:15:26,389 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:15:26,390 - Wuhan research controversy
+2024-11-29 11:15:26,390 - ['Wuhan research controversy']
+2024-11-29 11:15:26,390 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:15:30,848 - get_html_status(): bad status code 403 on URL: https://www.nejm.org/doi/full/10.1056/NEJMp2305081, html: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta nam
+2024-11-29 11:15:34,656 - get_html_status(): bad status code 403 on URL: https://www.science.org/content/article/covid-origin-report-controversy, html: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta nam
+2024-11-29 11:15:44,542 - 96.78571428571429
+2024-11-29 11:15:44,542 - Given the headline of a webpage, generate a query that a user of a web retrieval engine would type to verify the correctness of the information provided in the webpage.         Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. Headline of the Webpage: "This Is Worrying Me Quite A Bit": mRNA Vaccine Inventor Shares Viral Thread Showing COVID Surge In Most-Vaxxed Countries
+ Query:"
+2024-11-29 11:15:44,649 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:15:44,649 - COVID vaccine surge countries
+2024-11-29 11:15:44,649 - ['COVID vaccine surge countries']
+2024-11-29 11:15:44,649 - Using key...e76f38f817544d6d887c5916e115b4aa
+2024-11-29 11:15:51,518 - get_html_status(): bad status code 403 on URL: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(23)01468-X/fulltext, html: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta nam
+2024-11-29 11:15:58,220 - get_html_status(): bad status code 403 on URL: https://www.thenewhumanitarian.org/maps-and-graphics/2021/coronavirus-humanitarian-update-map-data-vaccine-aid-response, html: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta nam
+2024-11-29 11:16:01,789 - 98.0
+2024-11-29 11:16:01,790 - STEP 2
+2024-11-29 11:16:01,790 - Given the headline of a webpage, a user has conducted a search session to verify the correctness of the information provided in the webpage.        We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.        We also provide you with the full text of the first two results.         Taking into account the headline of the webpage, the user session queries and the search results, your task is to generate a new user query         to further verify the correctness of the information provided in the webpage.         Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift.         Avoid using stopwords. Queries should have between 3-5 words length.         Answer ONLY with the query.        Headline of the Webpage: "U.S. faces engineered famine as COVID lockdowns and vax mandates could lead to widespread hunger, unrest this winter"
+         User Queries: "['COVID induced famines']"
+         Search results: "Title: "Nations must ‘act together, urgently and with solidarity ... - UN News" Snippet: "Moreover, the COVID-induced economic shock has compounded food insecurity by reducing incomes and disrupting supply chains, leading to an uneven economic recovery. ... mass hunger and famine, in a crisis that could last for years,” warned the UN chief. “In the past year, global food prices have risen by nearly one-third, fertilizer by more ..."
+Title: "Pestilence and famine: Continuing down the vicious cycle with COVID-19" Snippet: "While the COVID-19 pandemic may not directly involve a volcano, history repeats itself. Disease leads to increased poverty, hunger, and changes in socioeconomic behaviors. Thus, insights from past pandemics frame the current COVID-19 hunger crisis and can inform actions to mitigate negative consequences from COVID-19 and future disease outbreaks."
+Title: "The eerie silence of starvation ‘is deafening, it never leaves you’: UN ..." Snippet: "Hunger and conflict “feed off of each other,” she continued, briefing the Security Council open debate on famine and conflict-induced global food insecurity convened by the United States during its August presidency. ... COVID-19: A ‘new and deadly threat’ for civilians caught up in violence. News Tracker: Past Stories on This Issue ..."
+Title: "Pestilence and famine: Continuing down the vicious cycle with COVID-19" Snippet: "On the other hand, pandemics, such as COVID-19, lead to greater malnutrition. Both over- and undernutrition increase severity of disease, alter vaccine effectiveness, and potentially create conditions for viral mutation and adaptation—further driving the disease and famine vicious cycle. These long-term health and socioeconomic repercussions ..."
+Title: "‘Tsunami of hunger’ could trigger multiple famines ... - UN News" Snippet: "As risks of conflict-induced famine and widespread food insecurity continue to rise, ... Meanwhile, drought, rising global commodity prices, and the impacts of COVID-19 and the Ukraine war are also compounding food insecurity and misery. And people in South Sudan, Nigeria, Ethiopia, Yemen, Afghanistan, and Somalia are “quite literally on the ..."
+Title: "Lack of Grain Exports Driving Global Hunger to Famine Levels, as War in ..." Snippet: "Russian Federation Delegate Refutes United States Claim That His Country Is Holding World Hostage with Blockade of Ukraine’s Ports. A global food crisis, already impacted by the COVID-19 pandemic and climate change, is being driven to famine levels worldwide by the war in Ukraine and the resulting lack of grain exports, more than 75 speakers told the Security Council today in a ministerial ..."
+Title: "Secretary Blinken Intervention at a United Nations Security Council ..." Snippet: "Secretary Blinken Intervention at a United Nations Security Council Open Debate on Famine and Conflict-Induced Global Food Insecurity. ... has been fueled by climate, by COVID as well, and, as we’re discussing today, by conflict. Hunger and conflict are inexorably linked. Scarce resources heighten tensions between communities and nations."
+Title: "Food Insecurity during COVID-19 in Yemen - PMC - National Center for ..." Snippet: "The United Nations has declared Yemen as the world’s worst humanitarian crisis with 21 million people in need of humanitarian assistance. Due to the convergence of severe economic instability exacerbated by the COVID-19 pandemic, stifling war, and spiking food prices, the Yemeni people are at the brink of famine with women and children especially malnourished."
+Title: "Conflict and Violence are the Primary Causes of Hunger and Famine ..." Snippet: "The world was facing severe global hunger, which had been fuelled by climate change and COVID-19 and decidedly worsened by conflicts, notably Russia’s unprovoked war against Ukraine. Some speakers said that the Russian war of aggression against Ukraine had aggravated the global food crisis, as these two countries supplied approximately 30 per ..."
+Title: "What is famine? How it's caused and how to stop it" Snippet: "What is famine? A famine is declared when a certain set of conditions have been met. This criteria includes at least 30% of a given area's children suffering from severe malnutrition. That means that, by the time a famine is declared, children are already starting to die because their parents cannot give them enough food to survive."
+"
+         Full text of the first search result: "During a ministerial meeting on global hunger taking pace at UN Headquarters in New York, Secretary-General António Guterres said the number of severely food insecure people had doubled in just two years – from 135 million pre-pandemic to 276 million today, with more than half a million experiencing famine conditions – an increase of more than 500 per cent since 2016.
+
+“These frightening figures are inextricably linked with conflict, as both cause, and effect,” he said. “If we do not feed people, we feed conflict”.
+
+Hunger triggers
+
+The climate emergency is another driver of global hunger he added, pointing out that 1.7 billion people have been affected by extreme weather and climate-related disasters over the past decade.
+
+Moreover, the COVID-induced economic shock has compounded food insecurity by reducing incomes and disrupting supply chains, leading to an uneven economic recovery. Access to financial markets has been restricted, with some developing States now on the brink of debt default.
+
+“Now the war in Ukraine is amplifying and accelerating all these factors: climate change, COVID-19, and inequality,” Mr. Guterres said.
+
+Ukraine war’s repercussions
+
+Between them, Ukraine and Russia produce almost a third of the world’s wheat and barley and half of its sunflower oil. Russia and Belarus are the world’s number two and three producers of potash, a key ingredient of fertilizer.
+
+The war threatens to tip “tens of millions of people over the edge into food insecurity, followed by malnutrition, mass hunger and famine, in a crisis that could last for years,” warned the UN chief.
+
+“In the past year, global food prices have risen by nearly one-third, fertilizer by more than half, and oil prices by almost two-thirds”.
+
+Devastating societies
+
+Meanwhile, most developing countries lack the fiscal space to cushion the blow of these huge increases with many unable to borrow because markets are closed to them.
+
+“If high fertilizer prices continue, today’s crisis in grain and cooking oil could affect many other foods including rice, impacting billions of people in Asia and the Americas,” he detailed.
+
+Additionally, children are threatened by a lifetime of stunting; millions of women and children will become malnourished; girls will be pulled from school and forced to work or get married; and families will embark on dangerous journeys across continents, just to survive.
+
+“High rates of hunger have a devastating impact on individuals, families, and societies,” spelled out the UN chief.
+
+‘Five urgent steps’
+
+However, if we act together, there is enough food for everyone, he said adding that “ending hunger is within our reach”.
+
+The Secretary-General then outlined five urgent steps to solve the short-term crisis and prevent long-term damage, beginning with reducing market pressure by increasing food supplies – with no restrictions on exports and surpluses available to those most in need.
+
+“But let’s be clear: there is no effective solution to the food crisis without reintegrating Ukraine’s food production, as well as the food and fertilizer produced by Russia and Belarus, into world markets, despite the war”.
+
+Secondly, social protection systems must cover all in need with food, cash; and water, sanitation, nutrition, and livelihood support must be provided.
+
+Fourth, governments must bolster agricultural production and invest in resilient food systems that protect smallholder food producers.
+
+And finally, humanitarian operations must be fully funded to prevent famine and reduce hunger.
+
+Act in solidarity
+
+In closing, the UN chief said that the Global Crisis Response Group on food, energy and finance is tracking the impact of the crisis on vulnerable people, identifying and pushing for solutions.
+
+“The food crisis has no respect for borders, and no country can overcome it alone,” he said.
+
+“Our only chance of lifting millions of people out of hunger is to act together, urgently and with solidarity".
+
+‘Goodwill’ needed
+
+US Secretary of State Antony Blinken chaired the meeting in which foreign ministers from approximately 30 regionally diverse countries discussed steps to address global food security, nutrition, and resilience.
+
+Describing the current situation as the “greatest global food insecurity crisis of our time,” Mr. Blinken attributed the emergency to conflict, drought and natural disasters – made worse by Russia’s war on Ukraine.
+
+Although hopeful, he said that “there is still a way to go” and that “the complex security, economic and financial implications require goodwill on all sides”.
+
+To address the global crisis, US Secretary announced $215 million in humanitarian aid.
+
+Urgent to open ports
+
+World Food Programme (WFP) chief David Beasley drew attention to a world “too fragile” from years of conflict, pandemic and climate threats.
+
+He also noted that current funding deficits could impede food access by as many as four million people.
+
+Additionally, the top WFP official pointed out that a “failure to open the ports” in and beyond Ukraine will force people to the brink of starvation.
+
+Although the “silos are full,” blockades and other impediments are rendering them inaccessible, Mr. Beasley said, urging governments to “step up” now”."
+         Full text of the second search result:"Access Denied
+
+Your access to the NCBI website at www.ncbi.nlm.nih.gov has been temporarily blocked due to a possible misuse/abuse situation involving your site. This is not an indication of a security issue such as a virus or attack. It could be something as simple as a run away script or learning how to better use E-utilities, http://www.ncbi.nlm.nih.gov/books/NBK25497/, for more efficient work such that your work does not impact the ability of other researchers to also use our site. To restore access and understand how to better interact with our site to avoid this in the future, please have your system administrator contact info@ncbi.nlm.nih.gov."
+        New User Query:(just answer with the query)
+2024-11-29 11:16:02,715 - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2024-11-29 11:16:02,715 - Verify the correctness of the webpage headline given a search session for information on global food
+2024-11-29 11:16:02,716 - Verify the correctness of the webpage headline given a search session for information on global food

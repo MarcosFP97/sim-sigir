@@ -19,7 +19,7 @@ from ollama import chat
 from ollama import ChatResponse
 from duckduckgo_search import DDGS
 
-logging.basicConfig(filename="title_full_text.log", level=logging.INFO, format="%(asctime)s - %(message)s")
+logging.basicConfig(filename="paragraph_full_text.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 
 def first_step_gen( #### OLLAMA SERVER TIENE QUE ESTAR LEVANTADO
     headline:str,
@@ -128,16 +128,23 @@ def second_step_gen(
         New User Query:(just answer with the query)"""
       logging.info(prompt)
     elif first_step_mode=="paragraph":
-      prompt= f'Given the headline of a webpage and its first paragraph, a user has typed a web query to verify the correctness of the information provided in the webpage.\
-          We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
-          For the first two search results, we also provide you the entire document when available. \
-          Taking into account the headline of the webpage, its first paragraph, the user query and the search results, your task is to generate a new user query \
-          to further verify the correctness of the information provided in the webpage. \
-          Avoid using stopwords. Queries should have between 3-5 words length. Answer ONLY with the query. \
-          Headline of the Webpage: {headline}\n \
-          First Paragraph of the Webpage: {text}\n \
-          User Query: \"{old_queries}\" \n \
-          Search results: {full_text_snippets}\nNew User Query:' #### I added stopwords and correct information
+      prompt= f"""Given the headline of a webpage, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
+        We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.\
+        We also provide you with the first paragraph of the first two search results. \
+        Taking into account the headline of the webpage, the user session queries and the search results, your task is to generate a new user query \
+        to further verify the correctness of the information provided in the webpage. \
+        Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift. \
+        Avoid using stopwords. \
+        Answer ONLY with the query.\
+        Queries should have between 3-5 words length. \
+        Headline of the Webpage: \"{headline}\"\n \
+        First Paragraph of the Webpage: {text}\n \
+        User Queries: \"{old_queries}\"\n \
+        Search results: \"{snippets_concated}\"\n \
+        First paragraph of the first search result: \"{first_full_text}\"\n \
+        First paragraph of the second search result:\"{second_full_text}\"\n\
+        New User Query:(just answer with the query)"""
+      logging.info(prompt)
     elif first_step_mode=="full_text":
       prompt= f'Given the headline of a webpage and its body, a user has typed a web query to verify the correctness of the information provided in the webpage.\
           We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
@@ -329,16 +336,16 @@ def simulate(corpus):
                 elif second_step_mode=='full_text': #### !!!!! A VECES NO APARECE EL PRIMER-SEGUNDO TEXTO
                     for orig_url, serp in last_serps.items(): # WE USE THE LAST SERP AS ENTRANCE FOR THE NEXT SIMULATION STEP
                         snippets_concat, first_full_text, second_full_text = "", "", "" ### IN THE FIRST VARIANT WE CONCAT ALL THE SNIPPETS
-                        i=0
+                        j=0
                         for entry in serp[3].values():
                             snippets_concat += "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\"\n' 
                             if entry["Full_text"]:
-                              if i==0:
+                              if j==0:
                                 first_full_text = entry["Full_text"]
-                                i+=1
-                              elif i==1:
+                                j+=1
+                              elif j==1:
                                 second_full_text = entry["Full_text"]
-                                i+=1
+                                j+=1
                         first_full_text = first_full_text.split('\n')[0]
                         second_full_text = second_full_text.split('\n')[0]
                         query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, first_full_text, second_full_text)
@@ -351,6 +358,7 @@ def simulate(corpus):
                         last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] #### UPDATE LAST SERP
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
+                        logging.info(avg_score)
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
 

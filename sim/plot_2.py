@@ -41,27 +41,40 @@ for f in os.listdir('./sim_output/title_full_text/bing-api/'):
     for step, values in dd.items():
       results_4[step].extend(values)
 
+results_5 = {step: [] for step in range(1,6)}
+for f in os.listdir('./sim_output/paragraph_full_text/bing-api/'):
+  if f.startswith('session_paragraph_full_text_steps'):
+    df = pd.read_csv('./sim_output/paragraph_full_text/bing-api/'+f)
+    #df['step'] = (df.index//17) +1
+    dd = df.groupby("STEP")["SERP"].apply(list).to_dict()
+    for step, values in dd.items():
+      results_5[step].extend(values)
+
 newsguard = pd.read_csv('./data/overall_bias.csv', sep=';')
 scores = {}
 
 # step = int(sys.argv[1])
 
 for step in range(1,6):
-    for i,variant in enumerate([results[step], results_2[step], results_3[step], results_4[step]]):
+    for i,variant in enumerate([results[step], results_2[step], results_3[step], results_4[step], results_5[step]]):
         if i==0:
-            var = "title"
+            var = "title + snippets"
             if not var in scores:
                 scores[var] = {step: [] for step in range(1,11)}
         if i==1:
-            var = "paragraph"
+            var = "paragraph + snippets"
             if not var in scores:
                 scores[var] = {step: [] for step in range(1,11)}
         if i==2:
-            var = "full"
+            var = "full text + snippets"
             if not var in scores:
                 scores[var] = {step: [] for step in range(1,11)}
         if i==3:
-           var = "title+full"
+           var = "title + first two entries"
+           if not var in scores:
+                scores[var] = {step: [] for step in range(1,11)}
+        if i==4:
+           var = "paragraph + first two entries"
            if not var in scores:
                 scores[var] = {step: [] for step in range(1,11)}
         for serp in variant:
@@ -78,7 +91,6 @@ for step in range(1,6):
   # print()
 
 
-print(len(scores["title"][10]))
 
 for k,val in scores.items():
   scores[k] = {k:np.mean(v) for k,v in val.items()}
@@ -94,18 +106,22 @@ plt.legend()
 plt.savefig('all-variants.png')
 plt.show()
 
-print(scores)
-title, paragraph, full, title_full = [],[],[],[]
+print(scores.keys())
+title, paragraph, full, title_full, par_full = [],[],[],[], []
 for k,v in scores.items():
-  if k=="title":
+  if k=="title + snippets":
     title.extend([val for val in v.values()])
-  elif k=="paragraph":
+  elif k=="paragraph + snippets":
     paragraph.extend([val for val in v.values()])
-  elif k=="full":
+  elif k=="full text + snippets":
     full.extend([val for val in v.values()])
-  elif k=="title+full":
+  elif k=="title + first two entries":
     title_full.extend([val for val in v.values()])
+  elif k=="paragraph + first two entries":
+    par_full.extend([val for val in v.values()])
 
+
+print(len(title), len(paragraph), len(full), len(title_full), len(par_full))
 
 from scipy.stats import wilcoxon
 res = wilcoxon(paragraph, title, alternative='greater')
@@ -119,4 +135,14 @@ print(res)
 res = wilcoxon(title_full, full, alternative='greater')
 print(res)
 res = wilcoxon(title_full, paragraph, alternative='greater')
+print(res)
+res = wilcoxon(par_full, paragraph, alternative='greater')
+print(res)
+res = wilcoxon(par_full, paragraph, alternative='greater')
+print(res)
+res = wilcoxon(par_full, full, alternative='greater')
+print(res)
+res = wilcoxon(par_full, title, alternative='greater')
+print(res)
+res = wilcoxon(par_full, title_full, alternative='greater')
 print(res)

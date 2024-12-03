@@ -41,7 +41,8 @@ def first_step_gen( #### OLLAMA SERVER TIENE QUE ESTAR LEVANTADO
       'role': 'user',
       'content': prompt,
     },
-  ], options={'num_predict':15})
+  ], #options={'num_predict':15}
+  )
   
   query = response['message']['content']
   query = query.replace('\'','').replace('\"','')
@@ -110,22 +111,23 @@ def second_step_gen(
   ########## MODIFY PROMPTS!!!!!!!
   elif second_step_mode=="full_text":
     if first_step_mode=="title":
-      prompt= f'Given the headline of a webpage, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
+      prompt= f"""Given the headline of a webpage, a user has conducted a search session to verify the correctness of the information provided in the webpage.\
         We provide you with the user session queries and the results for the last search. For each search result, we provide you with its title and snippet.\
-        We also provide you with the full text of the first two results. \
+        We also provide you with the first paragraph of the first two search results. \
         Taking into account the headline of the webpage, the user session queries and the search results, your task is to generate a new user query \
         to further verify the correctness of the information provided in the webpage. \
         Avoid repeating the exact same queries and introduce some variance in the new query, but avoiding topic drift. \
-        Avoid using stopwords. Queries should have between 3-5 words length. \
+        Avoid using stopwords. \
         Answer ONLY with the query.\
+        Queries should have between 3-5 words length. \
         Headline of the Webpage: \"{headline}\"\n \
         User Queries: \"{old_queries}\"\n \
         Search results: \"{snippets_concated}\"\n \
-        Full text of the first search result: \"{first_full_text}\"\n \
-        Full text of the second search result:\"{second_full_text}\"\n\
-        New User Query:(just answer with the query)'
+        First paragraph of the first search result: \"{first_full_text}\"\n \
+        First paragraph of the second search result:\"{second_full_text}\"\n\
+        New User Query:(just answer with the query)"""
       logging.info(prompt)
-    elif first_step_mode=="paragraph":f
+    elif first_step_mode=="paragraph":
       prompt= f'Given the headline of a webpage and its first paragraph, a user has typed a web query to verify the correctness of the information provided in the webpage.\
           We provide you with the user web query and its search results. For each search result, we provide you with its title and snippet.\
           For the first two search results, we also provide you the entire document when available. \
@@ -153,7 +155,9 @@ def second_step_gen(
       'role': 'user',
       'content': prompt,
     },
-  ], options={'num_predict':15})
+  ], 
+  #options={'num_predict':15}
+  )
   
   query = response['message']['content']
   query = query.replace('\'','').replace('\"','').replace('[','').replace(']','')
@@ -335,14 +339,16 @@ def simulate(corpus):
                               elif i==1:
                                 second_full_text = entry["Full_text"]
                                 i+=1
-
+                        first_full_text = first_full_text.split('\n')[0]
+                        second_full_text = second_full_text.split('\n')[0]
                         query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, first_full_text, second_full_text)
                         query_gen = query_gen.replace('"', '')
-                        logging.info(query_gen)
-                        serp = bing_search(query_gen, True) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+                        session_queries[orig_url].append(query_gen)
+                        logging.info(session_queries[orig_url])
+                        serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
                         headline = last_serps[orig_url][1] #### WE NEED TO PROPAGATE THE HEADLINE AND THE ORIGINAL TEXT (NONE, PARAGRAPH OR FULL TEXT) TO AVOID ERRORS
                         text = last_serps[orig_url][2]
-                        last_serps[orig_url] = [query_gen, headline, text, serp] #### UPDATE LAST SERP
+                        last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] #### UPDATE LAST SERP
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}

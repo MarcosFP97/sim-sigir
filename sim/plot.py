@@ -2,10 +2,13 @@ import os
 import pandas as pd
 
 results = {step: [] for step in range(1,6)}
-for f in os.listdir('./sim_output/full_text_snippet/bing-api/'):
-  if f.startswith('session_full_text_snippet_steps'):
-    df = pd.read_csv('./sim_output/full_text_snippet/bing-api/'+f)
-    dd = df.groupby("STEP")["AVG_SCORE"].apply(list).to_dict()
+for f in os.listdir('./sim_output/title_full_text/bing-api/'):
+  if f.startswith('session_title_full_text_steps'):
+    df = pd.read_csv('./sim_output/title_full_text/bing-api/'+f)
+    df['step'] = (df.index//17) +1
+    print()
+    print()
+    dd = df.groupby("step")["AVG_SCORE"].apply(list).to_dict()
     for step, values in dd.items():
       results[step].extend(values)
 print(f'{results}')
@@ -26,10 +29,10 @@ plt.boxplot(valores_ordenados)
 plt.xticks(range(1, len(claves_ordenadas) + 1), claves_ordenadas)
 
 # Añadir título y etiquetas a los ejes
-# plt.full_text("Boxplots con claves ordenadas")
+# plt.paragraph("Boxplots con claves ordenadas")
 plt.xlabel("Query position in session")
 plt.ylim(50, 105)
-plt.savefig('full_text-snippet.png')
+plt.savefig('title-full_text.png')
 plt.show()
 import numpy as np
 for i in valores_ordenados:

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 import numpy as np
+from scipy.stats import mannwhitneyu
 
 results = {step: [] for step in range(1,6)}
 for f in os.listdir('./sim_output/title_snippet/bing-api/'):
@@ -50,37 +51,50 @@ for f in os.listdir('./sim_output/paragraph_full_text/bing-api/'):
     for step, values in dd.items():
       results_5[step].extend(values)
 
+results_6 = {step: [] for step in range(1,6)}
+for f in os.listdir('./sim_output/full_text_full_text/bing-api/'):
+  if f.startswith('session_full_text_full_text_steps'):
+    df = pd.read_csv('./sim_output/full_text_full_text/bing-api/'+f)
+    #df['step'] = (df.index//17) +1
+    dd = df.groupby("STEP")["SERP"].apply(list).to_dict()
+    for step, values in dd.items():
+      results_6[step].extend(values)
+
 newsguard = pd.read_csv('./data/overall_bias.csv', sep=';')
 scores = {}
 
 # step = int(sys.argv[1])
 
 for step in range(1,6):
-    for i,variant in enumerate([results[step], results_2[step], results_3[step], results_4[step], results_5[step]]):
+    for i,variant in enumerate([results[step], results_2[step], results_3[step], results_4[step], results_5[step], results_6[step]]):
         if i==0:
-            var = "title + snippets"
+            var = "H - TS"
             if not var in scores:
-                scores[var] = {step: [] for step in range(1,11)}
+                scores[var] = {i: [] for i in range(1,11)}
         if i==1:
-            var = "paragraph + snippets"
+            var = "H 1P - TS"
             if not var in scores:
-                scores[var] = {step: [] for step in range(1,11)}
+                scores[var] = {i: [] for i in range(1,11)}
         if i==2:
-            var = "full text + snippets"
+            var = "FT - TS"
             if not var in scores:
-                scores[var] = {step: [] for step in range(1,11)}
+                scores[var] = {i: [] for i in range(1,11)}
         if i==3:
-           var = "title + first two entries"
+           var = "H - TS 1P TOP2"
            if not var in scores:
-                scores[var] = {step: [] for step in range(1,11)}
+                scores[var] = {i: [] for i in range(1,11)}
         if i==4:
-           var = "paragraph + first two entries"
+           var = "H 1P - TS 1P TOP2"
            if not var in scores:
-                scores[var] = {step: [] for step in range(1,11)}
+                scores[var] = {i: [] for i in range(1,11)}
+        if i==5:
+           var = "FT - TS 1P TOP2"
+           if not var in scores:
+                scores[var] = {i: [] for i in range(1,11)}
         for serp in variant:
             serp = ast.literal_eval(serp)
             for pos, val in serp.items():
-                #print(pos, val['URL'])
+                # print(pos, val['URL'])
                 domain = urlparse(val["URL"]).netloc
                 domain = domain.replace('www.', '')
                 if domain in newsguard["domain"].values:
@@ -91,58 +105,65 @@ for step in range(1,6):
   # print()
 
 
+print(len(scores['H - TS'][1]))
+print(len(scores['H 1P - TS'][1]))
+
+print(mannwhitneyu(scores['H - TS'][1], scores['FT - TS'][1]))
+print(mannwhitneyu(scores['H - TS'][1], scores['H 1P - TS'][1]))
+print(mannwhitneyu(scores['H - TS'][1], scores["H - TS 1P TOP2"][1]))
+print(mannwhitneyu(scores['H - TS'][1], scores["H 1P - TS 1P TOP2"][1]))
+print()
+print()
+#########
+print(mannwhitneyu(scores['H 1P - TS'][1], scores['FT - TS'][1]))
+print(mannwhitneyu(scores['H 1P - TS'][1], scores["H - TS 1P TOP2"][1]))
+print(mannwhitneyu(scores['H 1P - TS'][1], scores["H 1P - TS 1P TOP2"][1]))
+print()
+print()
+#########
+print(mannwhitneyu(scores['FT - TS'][1], scores["H - TS 1P TOP2"][1]))
+print(mannwhitneyu(scores['FT - TS'][1], scores["H 1P - TS 1P TOP2"][1]))
+print()
+print()
+#########
+print(mannwhitneyu(scores["H - TS 1P TOP2"][1], scores["H 1P - TS 1P TOP2"][1]))
+print()
+print()
+############
+print(mannwhitneyu(scores["FT - TS 1P TOP2"][1], scores['H - TS'][1]))
+print(mannwhitneyu(scores["FT - TS 1P TOP2"][1], scores['FT - TS'][1]))
+print(mannwhitneyu(scores["FT - TS 1P TOP2"][1], scores['H 1P - TS'][1]))
+print(mannwhitneyu(scores["FT - TS 1P TOP2"][1], scores["H - TS 1P TOP2"][1]))
+print(mannwhitneyu(scores["FT - TS 1P TOP2"][1], scores["H 1P - TS 1P TOP2"][1]))
+print()
+print()
+#########
+
 
 for k,val in scores.items():
   scores[k] = {k:np.mean(v) for k,v in val.items()}
 
 plt.figure(figsize=(8,6))
 
+
+markers = ['o', 's', '^', 'v', 'd', 'x']
+m=0
 for variant, values in scores.items():
   xs = list(values.keys())
   ys = list(values.values())
-  plt.plot(xs, ys, marker='o', label=variant)
+  plt.plot(xs, ys, marker=markers[m], label=variant)
+  m+=1
 
+plt.grid(color='gray', linestyle='--', linewidth=0.5, alpha=0.7)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.gca().xaxis.set_ticks_position('none')
+plt.gca().yaxis.set_ticks_position('none')
 plt.legend()
 plt.savefig('all-variants.png')
 plt.show()
 
-print(scores.keys())
-title, paragraph, full, title_full, par_full = [],[],[],[], []
-for k,v in scores.items():
-  if k=="title + snippets":
-    title.extend([val for val in v.values()])
-  elif k=="paragraph + snippets":
-    paragraph.extend([val for val in v.values()])
-  elif k=="full text + snippets":
-    full.extend([val for val in v.values()])
-  elif k=="title + first two entries":
-    title_full.extend([val for val in v.values()])
-  elif k=="paragraph + first two entries":
-    par_full.extend([val for val in v.values()])
+#print(scores)
 
-
-print(len(title), len(paragraph), len(full), len(title_full), len(par_full))
-
-from scipy.stats import wilcoxon
-res = wilcoxon(paragraph, title, alternative='greater')
-print(res)
-res = wilcoxon(paragraph, full, alternative='greater')
-print(res)
-res = wilcoxon(full, title, alternative='greater')
-print(res)
-res = wilcoxon(title_full, title, alternative='greater')
-print(res)
-res = wilcoxon(title_full, full, alternative='greater')
-print(res)
-res = wilcoxon(title_full, paragraph, alternative='greater')
-print(res)
-res = wilcoxon(par_full, paragraph, alternative='greater')
-print(res)
-res = wilcoxon(par_full, paragraph, alternative='greater')
-print(res)
-res = wilcoxon(par_full, full, alternative='greater')
-print(res)
-res = wilcoxon(par_full, title, alternative='greater')
-print(res)
-res = wilcoxon(par_full, title_full, alternative='greater')
-print(res)

@@ -1,3 +1,7 @@
 newspaper4k 
 lxml[html_clean]
-openai
+pandas
+json
+numpy
+ollama
+scipy

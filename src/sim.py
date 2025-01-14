@@ -1,5 +1,4 @@
 import pandas as pd
-from openai import OpenAI
 import logging
 import os
 import json
@@ -17,11 +16,14 @@ import pandas as pd
 from config import OPENAI_API_KEY, MODEL, BING_API_KEYS
 from ollama import chat
 from ollama import ChatResponse
-from duckduckgo_search import DDGS
 
 logging.basicConfig(filename="full_text_full_text.log", level=logging.INFO, format="%(asctime)s - %(message)s")
 
-def first_step_gen( #### OLLAMA SERVER TIENE QUE ESTAR LEVANTADO
+
+'''
+This method generates the queries for the first search from different parts of the article (H, H 1P, FT)
+'''
+def first_step_gen( 
     headline:str,
     text:str
   ):
@@ -41,23 +43,18 @@ def first_step_gen( #### OLLAMA SERVER TIENE QUE ESTAR LEVANTADO
       'role': 'user',
       'content': prompt,
     },
-  ], #options={'num_predict':15}
+  ], 
   )
   
   query = response['message']['content']
   query = query.replace('\'','').replace('\"','')
   logging.info(query)
-  # completion = client.chat.completions.create(
-  #   model=MODEL,
-  #   messages=[
-  #     {"role": "system", "content": "You are a search query writer"},
-  #     {"role": "user", "content": prompt}
-  #   ],
-  #   temperature=0.7
-  # )
 
   return query
 
+'''
+This method generates the queries for the subsequent steps of the simulation (TS or TS 1P TOP2)
+'''
 def second_step_gen(
     headline:str,
     text:str, # either first paragrph or full text
@@ -168,20 +165,11 @@ def second_step_gen(
       'content': prompt,
     },
   ], 
-  #options={'num_predict':15}
   )
   
   query = response['message']['content']
   query = query.replace('\'','').replace('\"','').replace('[','').replace(']','')
   logging.info(query)
-    # completion = client.chat.completions.create(
-    #   model=MODEL,
-    #   messages=[
-    #     {"role": "system", "content": "You are a search query writer"},
-    #     {"role": "user", "content": prompt}
-    #   ],
-    #   temperature=0.7
-    # )
 
   return query
 
@@ -222,20 +210,9 @@ def bing_search(
     except Exception as ex:
         continue
 
-def duckduckgo_search(
-    query:str
-):
-  results = DDGS(proxy='socks5h://127.0.0.1:9050').text(query, max_results=10)
-  serp = {}
-  for i,val in enumerate(results):
-    try: #### SI NO PUEDO RECUPERAR
-      full_text = newspaper.article(val["href"])
-      full_text  = full_text.text
-    except:
-      full_text = ""
-    serp[i+1] = {'URL':val["href"], 'Headline':val["title"], 'Snippet':val["body"], 'Full_text':full_text}
-  return serp
-
+'''
+This method inspects the Newsguard scores file and returns an average quality score for the entire SERP
+'''
 def eval_serp(serp):
   scores = pd.read_csv(DATA_DIR+'/overall_bias.csv', sep=';')
 
@@ -249,10 +226,13 @@ def eval_serp(serp):
       newsguard.append(score)
   return np.mean(newsguard)
 
+'''
+This method executes an entire simulation (5 search steps) 10 times for every article in the corpus
+'''
 def simulate(corpus):
     ll = list({5})*10
-    count=1 ######### THIS!!!
-    for sample in ll: # samples: ##### THIS!!!
+    count=1
+    for sample in ll:
         logging.info("=======SESSION STARTED=========")
         logging.info(f"Session length: {sample}")
         cols = ["URL", "query", "SERP", "AVG_SCORE", "STEP"]
@@ -272,7 +252,7 @@ def simulate(corpus):
                            session_queries[orig_url] = []
                         session_queries[orig_url].append(query_gen)
                         logging.info(session_queries[orig_url])
-                        serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+                        serp = bing_search(query_gen)
                         last_serps[orig_url] = [session_queries[orig_url], headline, "", serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
@@ -281,7 +261,7 @@ def simulate(corpus):
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
                         #break
                 elif first_step_mode=="paragraph":
-                    #### FUNCIÓN QUE CONCATENE TITLE Y FIRST PARAGRAPH
+                    
                     for orig_url, headline, text in zip(corpus["URL"].values, corpus["Headline"].values, corpus["plain_text"]):
                         #### CALL TO GEN
                         first_paragraph = text.split('\n')[0]
@@ -291,7 +271,7 @@ def simulate(corpus):
                            session_queries[orig_url] = []
                         session_queries[orig_url].append(query_gen)
                         logging.info(session_queries[orig_url])
-                        serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+                        serp = bing_search(query_gen) 
                         last_serps[orig_url] = [session_queries[orig_url], headline, first_paragraph, serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
@@ -299,7 +279,7 @@ def simulate(corpus):
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
                 elif first_step_mode=="full_text":
-                    #### FUNCIÓN QUE CONCATENE TITLE Y FULL TEXT
+                    
                     for orig_url, headline, text in zip(corpus["URL"].values, corpus["Headline"].values, corpus["plain_text"]):
                         #### CALL TO GEN
                         query_gen = first_step_gen(headline, text)
@@ -308,7 +288,7 @@ def simulate(corpus):
                            session_queries[orig_url] = []
                         session_queries[orig_url].append(query_gen)
                         logging.info(session_queries[orig_url])
-                        serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+                        serp = bing_search(query_gen) 
                         last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] ### KEEPING TRACK OF THE LAST SERPS
                         time.sleep(2) ### DELAY IN CALLS TO BING SEARCH API
                         avg_score = eval_serp(serp)
@@ -321,14 +301,14 @@ def simulate(corpus):
                 if second_step_mode=='snippet':
                     for orig_url, serp in last_serps.items(): # WE USE THE LAST SERP AS ENTRANCE FOR THE NEXT SIMULATION STEP
                         snippets_concat = "" ### IN THE FIRST VARIANT WE CONCAT ALL THE SNIPPETS
-                        # logging.info("SERP", serp)
+                        
                         for entry in serp[3].values():
                             snippets_concat += "Title: \""+entry["Headline"] + "\" Snippet: \"" + entry["Snippet"] +'\"\n' # "\" Snippet: \"" + entry["Snippet"] +'\"\n' #
                         query_gen = second_step_gen(serp[1], serp[2], serp[0], snippets_concat, None, None)
                         query_gen = query_gen.replace('"', '')
                         session_queries[orig_url].append(query_gen)
                         logging.info(session_queries[orig_url])
-                        serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+                        serp = bing_search(query_gen) 
                         headline = last_serps[orig_url][1] #### WE NEED TO PROPAGATE THE HEADLINE AND THE ORIGINAL TEXT (NONE, PARAGRAPH OR FULL TEXT) TO AVOID ERRORS
                         text = last_serps[orig_url][2]
                         last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] #### UPDATE LAST SERP
@@ -338,7 +318,7 @@ def simulate(corpus):
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
 
-                elif second_step_mode=='full_text': #### !!!!! A VECES NO APARECE EL PRIMER-SEGUNDO TEXTO
+                elif second_step_mode=='full_text': 
                     for orig_url, serp in last_serps.items(): # WE USE THE LAST SERP AS ENTRANCE FOR THE NEXT SIMULATION STEP
                         snippets_concat, first_full_text, second_full_text = "", "", "" ### IN THE FIRST VARIANT WE CONCAT ALL THE SNIPPETS
                         j=0
@@ -357,7 +337,7 @@ def simulate(corpus):
                         query_gen = query_gen.replace('"', '')
                         session_queries[orig_url].append(query_gen)
                         logging.info(session_queries[orig_url])
-                        serp = bing_search(query_gen) ##### !!!!! I NEED TO MODIFY THE FRESHNESS
+                        serp = bing_search(query_gen)
                         headline = last_serps[orig_url][1] #### WE NEED TO PROPAGATE THE HEADLINE AND THE ORIGINAL TEXT (NONE, PARAGRAPH OR FULL TEXT) TO AVOID ERRORS
                         text = last_serps[orig_url][2]
                         last_serps[orig_url] = [session_queries[orig_url], headline, text, serp] #### UPDATE LAST SERP
@@ -367,7 +347,6 @@ def simulate(corpus):
                         newline = {"URL":orig_url, "query":query_gen, "SERP":serp, "AVG_SCORE": avg_score, "STEP": i+1}
                         session = pd.concat([session, pd.DataFrame([newline])], ignore_index=True)
 
-        ###### SALVAR EN UN CSV
         session.to_csv(SIM_DIR+f'/{first_step_mode}_{second_step_mode}/bing-api/session_{first_step_mode}_{second_step_mode}_steps_{sample}_{count}.csv', sep=',', index=False, header=True)
         logging.info("======SESSION ENDED========")
         count+=1
@@ -376,8 +355,6 @@ if __name__=="__main__":
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(BASE_DIR, "data")
     SIM_DIR = os.path.join(BASE_DIR, "sim_output")
-     ## Set the API key and model name
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", OPENAI_API_KEY))
     first_step_mode = sys.argv[1] # other modes 'paragraph', 'full_text'
     second_step_mode = sys.argv[2] # other modes 'full_text'
     corpus = pd.read_csv(DATA_DIR+'/corpus_def.csv')
